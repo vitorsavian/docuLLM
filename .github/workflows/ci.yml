@@ -27,6 +27,20 @@ jobs:
       - name: build
         run: go build ./cmd/mcp-server-susedoc
 
+  real-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - name: fetch documentation
+        run: scripts/fetch-testdata.sh "$RUNNER_TEMP/testdata"
+      - name: go test
+        env:
+          SUSEDOC_REQUIRE_TESTDATA: "1"
+        run: go test -race -count=1 -run '^TestReal' ./internal/docparse/...
+
   lint:
     runs-on: ubuntu-latest
     steps:
